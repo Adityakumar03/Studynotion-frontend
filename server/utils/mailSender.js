@@ -1,4 +1,4 @@
-const nodemailer = require("nodemailer")
+const nodemailer = require("nodemailer");
 
 const mailSender = async (email, title, body) => {
   try {
@@ -8,7 +8,7 @@ const mailSender = async (email, title, body) => {
         user: process.env.MAIL_USER,
         pass: process.env.MAIL_PASS,
       },
-      secure: false,
+      secure: false, // Use false for port 587, true for port 465
     })
 
     let info = await transporter.sendMail({
@@ -17,12 +17,15 @@ const mailSender = async (email, title, body) => {
       subject: `${title}`, // Subject line
       html: `${body}`, // html body
     })
-    console.log(info.response)
-    return info
+    
+    console.log("Email Info: ", info.response);
+    return info;
+
   } catch (error) {
-    console.log(error.message)
-    return error.message
+    console.log("Error in mailSender: ", error.message);
+    // IMPORTANT: Throw the error so the calling function (OTP hook) knows it failed
+    throw error; 
   }
 }
 
-module.exports = mailSender
+module.exports = mailSender;
