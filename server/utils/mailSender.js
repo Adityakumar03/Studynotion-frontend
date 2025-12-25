@@ -8,24 +8,31 @@ const mailSender = async (email, title, body) => {
         user: process.env.MAIL_USER,
         pass: process.env.MAIL_PASS,
       },
-      secure: false, // Use false for port 587, true for port 465
-    })
+      secure: false, // For port 587
+    });
 
-    let info = await transporter.sendMail({
-      from: `"Studynotion || EdTech App" <${process.env.MAIL_USER}>`, // sender address
-      to: `${email}`, // list of receivers
-      subject: `${title}`, // Subject line
-      html: `${body}`, // html body
-    })
-    
-    console.log("Email Info: ", info.response);
-    return info;
+    // FORCE VERCEL TO WAIT USING A PROMISE
+    return await new Promise((resolve, reject) => {
+      transporter.sendMail({
+        from: `"Studynotion || EdTech App" <${process.env.MAIL_USER}>`,
+        to: `${email}`,
+        subject: `${title}`,
+        html: `${body}`,
+      }, (err, info) => {
+        if (err) {
+          console.error("Nodemailer Error:", err);
+          reject(err); // This sends the error to the 'catch' block
+        } else {
+          console.log("Email Sent:", info.response);
+          resolve(info); // This returns the success info
+        }
+      });
+    });
 
   } catch (error) {
-    console.log("Error in mailSender: ", error.message);
-    // IMPORTANT: Throw the error so the calling function (OTP hook) knows it failed
-    throw error; 
+    console.log("Error in mailSender:", error.message);
+    throw error; // Rethrow to let the controller/model know it failed
   }
-}
+};
 
 module.exports = mailSender;
