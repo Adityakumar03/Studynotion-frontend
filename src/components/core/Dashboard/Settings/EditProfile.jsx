@@ -1,106 +1,127 @@
-import React from "react"
-import { RiEditBoxLine } from "react-icons/ri"
-import { useSelector } from "react-redux"
+import { useForm } from "react-hook-form"
+import { useDispatch, useSelector } from "react-redux"
 import { useNavigate } from "react-router-dom"
+import { updateProfile } from "../../../../services/operations/SettingsAPI"
 import IconBtn from "../../../Common/IconBtn"
 
-export default function MyProfile() {
+export default function EditProfile() {
   const { user } = useSelector((state) => state.profile)
+  const { token } = useSelector((state) => state.auth)
   const navigate = useNavigate()
+  const dispatch = useDispatch()
 
-  // Data array for the Personal Details section to keep JSX clean
-  const personalDetails = [
-    { label: "First Name", value: user?.firstName },
-    { label: "Last Name", value: user?.lastName },
-    { label: "Email", value: user?.email, wrap: "break-all" },
-    { 
-        label: "Phone Number", 
-        value: user?.additionalDetails?.contactNumber ?? "Add Contact Number" 
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
+      firstName: user?.firstName || "",
+      lastName: user?.lastName || "",
+      dateOfBirth: user?.additionalDetails?.dateOfBirth || "",
+      gender: user?.additionalDetails?.gender || "",
+      contactNumber: user?.additionalDetails?.contactNumber || "",
+      about: user?.additionalDetails?.about || "",
     },
-    { 
-        label: "Gender", 
-        value: user?.additionalDetails?.gender ?? "Add Gender" 
-    },
-    { 
-        label: "Date of Birth", 
-        value: user?.additionalDetails?.dateOfBirth ?? "Add Date of Birth" 
-    },
-  ]
+  })
+
+  const onSubmit = async (data) => {
+    try {
+      dispatch(updateProfile(token, data))
+    } catch (error) {
+      console.log("ERROR MESSAGE - ", error.message)
+    }
+  }
 
   return (
-    <div className="flex flex-col gap-y-10 px-4 md:px-0">
-      <h1 className="mb-1 mt-4 text-3xl font-medium text-richblack-5">
-        My Profile
-      </h1>
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <div className="my-10 flex flex-col gap-y-6 rounded-md border-[1px] border-richblack-700 bg-richblack-800 p-8 px-12">
+        <h2 className="text-lg font-semibold text-richblack-5">
+          Profile Information
+        </h2>
 
-      {/* SECTION 1: Image, Name, and Email */}
-      <div className="flex items-center justify-between rounded-md border-[1px] border-richblack-700 bg-richblack-800 p-6 md:p-8 md:px-12">
-        <div className="flex items-center gap-x-4 min-w-0">
-          <img
-            src={user?.image}
-            alt={`profile-${user?.firstName}`}
-            className="aspect-square w-[60px] md:w-[78px] rounded-full object-cover border-2 border-richblack-700"
-          />
-          <div className="flex flex-col justify-center min-w-0">
-            <p className="text-lg font-semibold text-richblack-5 truncate">
-              {user?.firstName + " " + user?.lastName}
-            </p>
-            <p className="text-sm text-richblack-300 truncate">
-              {user?.email}
-            </p>
+        {/* Row 1: Names */}
+        <div className="flex flex-col gap-5 lg:flex-row">
+          <div className="flex flex-col gap-2 lg:w-[48%]">
+            <label htmlFor="firstName" className="text-richblack-5 text-sm">First Name</label>
+            <input
+              type="text"
+              id="firstName"
+              className="rounded-md bg-richblack-700 p-3 text-richblack-5"
+              {...register("firstName", { required: true })}
+            />
+          </div>
+          <div className="flex flex-col gap-2 lg:w-[48%]">
+            <label htmlFor="lastName" className="text-richblack-5 text-sm">Last Name</label>
+            <input
+              type="text"
+              id="lastName"
+              className="rounded-md bg-richblack-700 p-3 text-richblack-5"
+              {...register("lastName", { required: true })}
+            />
           </div>
         </div>
-        <div className="flex-shrink-0">
-          <IconBtn
-            text="Edit"
-            onclick={() => navigate("/dashboard/settings")}
-          >
-            <RiEditBoxLine />
-          </IconBtn>
+
+        {/* Row 2: DOB and Gender */}
+        <div className="flex flex-col gap-5 lg:flex-row">
+          <div className="flex flex-col gap-2 lg:w-[48%]">
+            <label htmlFor="dateOfBirth" className="text-richblack-5 text-sm">Date of Birth</label>
+            <input
+              type="date"
+              id="dateOfBirth"
+              className="rounded-md bg-richblack-700 p-3 text-richblack-5"
+              {...register("dateOfBirth", { required: true })}
+            />
+          </div>
+          <div className="flex flex-col gap-2 lg:w-[48%]">
+            <label htmlFor="gender" className="text-richblack-5 text-sm">Gender</label>
+            <select
+              id="gender"
+              className="rounded-md bg-richblack-700 p-3 text-richblack-5"
+              {...register("gender", { required: true })}
+            >
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Non-Binary">Non-Binary</option>
+              <option value="Prefer not to say">Prefer not to say</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Row 3: Contact Number and About */}
+        <div className="flex flex-col gap-5 lg:flex-row">
+          <div className="flex flex-col gap-2 lg:w-[48%]">
+            <label htmlFor="contactNumber" className="text-richblack-5 text-sm">Contact Number</label>
+            <input
+              type="tel"
+              id="contactNumber"
+              className="rounded-md bg-richblack-700 p-3 text-richblack-5"
+              {...register("contactNumber", { required: true, maxLength: 12, minLength: 10 })}
+            />
+          </div>
+          <div className="flex flex-col gap-2 lg:w-[48%]">
+            <label htmlFor="about" className="text-richblack-5 text-sm">About</label>
+            <input
+              type="text"
+              id="about"
+              className="rounded-md bg-richblack-700 p-3 text-richblack-5"
+              {...register("about", { required: true })}
+            />
+          </div>
         </div>
       </div>
 
-      {/* SECTION 2: About Card */}
-      <div className="flex flex-col gap-y-6 rounded-md border-[1px] border-richblack-700 bg-richblack-800 p-6 md:p-8 md:px-12">
-        <div className="flex w-full items-center justify-between">
-          <h2 className="text-lg font-semibold text-richblack-5">About</h2>
-          <IconBtn
-            text="Edit"
-            onclick={() => navigate("/dashboard/settings")}
-          >
-            <RiEditBoxLine />
-          </IconBtn>
-        </div>
-        <p className={`${user?.additionalDetails?.about ? "text-richblack-5" : "text-richblack-400"} text-sm font-medium leading-relaxed`}>
-          {user?.additionalDetails?.about ?? "Write Something About Yourself"}
-        </p>
+      <div className="flex justify-end gap-x-2">
+        <button
+          type="button"
+          onClick={() => navigate("/dashboard/my-profile")}
+          className="rounded-md bg-richblack-700 py-2 px-5 font-semibold text-richblack-50"
+        >
+          Cancel
+        </button>
+        <IconBtn type="submit" text="Save" />
       </div>
-
-      {/* SECTION 3: Personal Details Grid */}
-      <div className="flex flex-col gap-y-6 rounded-md border-[1px] border-richblack-700 bg-richblack-800 p-6 md:p-8 md:px-12">
-        <div className="flex w-full items-center justify-between">
-          <h2 className="text-lg font-semibold text-richblack-5">Personal Details</h2>
-          <IconBtn
-            text="Edit"
-            onclick={() => navigate("/dashboard/settings")}
-          >
-            <RiEditBoxLine />
-          </IconBtn>
-        </div>
-
-        <div className="grid grid-cols-1 gap-y-5 gap-x-4 sm:grid-cols-2 lg:grid-cols-3">
-          {personalDetails.map((item, idx) => (
-            <div key={idx} className="flex flex-col gap-y-1 min-w-0">
-              <p className="text-xs text-richblack-600 uppercase font-semibold">
-                {item.label}
-              </p>
-              <p className={`text-sm font-medium text-richblack-5 ${item.wrap || "truncate"}`}>
-                {item.value}
-              </p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
+    </form>
   )
 }
