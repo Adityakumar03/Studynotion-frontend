@@ -19,6 +19,7 @@ const Community = ["Forums", "Chapters", "Events"];
 const FooterLink = ({ to, children }) => (
   <Link 
     to={to} 
+    onClick={() => window.scrollTo(0, 0)} // Immediate scroll for mobile UX
     className="text-[14px] cursor-pointer hover:text-richblack-50 transition-all duration-200"
   >
     {children}
@@ -33,42 +34,42 @@ const Footer = () => {
         {/* Main Section */}
         <div className="flex flex-col lg:flex-row border-b border-richblack-700 pb-10 gap-10">
           
-          {/* LEFT SIDE */}
+          {/* LEFT SIDE: Company, Resources, Plans, Community */}
           <div className="lg:w-[50%] flex flex-col gap-10 lg:border-r lg:border-richblack-700 lg:pr-10">
             
-            {/* Upper Row: Company and Resources */}
+            {/* Top Row: Company and Resources side-by-side on Mobile */}
             <div className="flex flex-row justify-between w-full">
                 {/* Column 1: Company */}
                 <div className="w-[48%] md:w-[33%] flex flex-col gap-3">
-                <img src={Logo} alt="Logo" className="object-contain w-32" />
-                <h2 className="text-richblack-50 font-semibold text-base mt-2">Company</h2>
-                <div className="flex flex-col gap-2">
-                    {["About", "Careers", "Affiliates"].map((ele) => (
-                    <FooterLink key={ele} to={ele.toLowerCase()}>{ele}</FooterLink>
-                    ))}
-                </div>
-                <div className="flex gap-3 text-lg mt-1">
-                    <FaFacebook className="hover:text-richblack-50 cursor-pointer" />
-                    <FaGoogle className="hover:text-richblack-50 cursor-pointer" />
-                    <FaTwitter className="hover:text-richblack-50 cursor-pointer" />
-                    <FaYoutube className="hover:text-richblack-50 cursor-pointer" />
-                </div>
+                  <img src={Logo} alt="Logo" className="object-contain w-32" />
+                  <h2 className="text-richblack-50 font-semibold text-base mt-2">Company</h2>
+                  <div className="flex flex-col gap-2">
+                      {["About", "Careers", "Affiliates"].map((ele) => (
+                      <FooterLink key={ele} to={ele.toLowerCase()}>{ele}</FooterLink>
+                      ))}
+                  </div>
+                  <div className="flex gap-3 text-lg mt-1">
+                      <FaFacebook className="hover:text-richblack-50 cursor-pointer" />
+                      <FaGoogle className="hover:text-richblack-50 cursor-pointer" />
+                      <FaTwitter className="hover:text-richblack-50 cursor-pointer" />
+                      <FaYoutube className="hover:text-richblack-50 cursor-pointer" />
+                  </div>
                 </div>
 
                 {/* Column 2: Resources */}
                 <div className="w-[48%] md:w-[33%] flex flex-col gap-3">
-                <h2 className="text-richblack-50 font-semibold text-base">Resources</h2>
-                <div className="flex flex-col gap-2">
-                    {Resources.map((ele) => (
-                    <FooterLink key={ele} to={ele.split(" ").join("-").toLowerCase()}>{ele}</FooterLink>
-                    ))}
-                </div>
-                <h2 className="text-richblack-50 font-semibold text-base mt-4">Support</h2>
-                <FooterLink to="/help-center">Help Center</FooterLink>
+                  <h2 className="text-richblack-50 font-semibold text-base">Resources</h2>
+                  <div className="flex flex-col gap-2">
+                      {Resources.map((ele) => (
+                      <FooterLink key={ele} to={ele.split(" ").join("-").toLowerCase()}>{ele}</FooterLink>
+                      ))}
+                  </div>
+                  <h2 className="text-richblack-50 font-semibold text-base mt-4">Support</h2>
+                  <FooterLink to="/help-center">Help Center</FooterLink>
                 </div>
             </div>
 
-            {/* Lower Row: Plans and Community side by side */}
+            {/* Bottom Row: Plans and Community side-by-side on Mobile */}
             <div className="flex flex-row justify-between w-full">
                 <div className="w-[48%] md:w-[33%] flex flex-col gap-3">
                     <h2 className="text-richblack-50 font-semibold text-base">Plans</h2>
@@ -87,12 +88,13 @@ const Footer = () => {
                         ))}
                     </div>
                 </div>
-                {/* Empty div for md/lg alignment to keep 3-col feel on larger screens */}
+                {/* Hidden space holder to maintain 3-column look on Tablet/Desktop */}
                 <div className="hidden md:block md:w-[33%]"></div>
             </div>
           </div>
 
           {/* RIGHT SIDE: Subjects, Languages, Career Building */}
+          {/* Using grid here because these lists are more uniform */}
           <div className="lg:w-[50%] grid grid-cols-2 md:grid-cols-3 gap-8 lg:pl-10">
             {FooterLink2.map((section, i) => (
               <div key={i} className="flex flex-col gap-3">
@@ -111,7 +113,7 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* Bottom Section */}
+        {/* Bottom Bar */}
         <div className="flex flex-col md:flex-row items-center justify-between mt-10 gap-5 text-sm">
           <div className="flex flex-row items-center divide-x divide-richblack-700">
             {BottomFooter.map((ele, i) => (
