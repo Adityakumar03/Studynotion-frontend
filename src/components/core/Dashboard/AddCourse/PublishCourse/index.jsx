@@ -94,7 +94,13 @@ export default function PublishCourse() {
           >
             Back
           </button>
-          <IconBtn disabled={loading} text="Save Changes" />
+
+          {/* Add type="submit" so it triggers the form onSubmit */}
+          <IconBtn
+            disabled={loading}
+            text="Save Changes"
+            type="submit"
+          />
         </div>
       </form>
     </div>
