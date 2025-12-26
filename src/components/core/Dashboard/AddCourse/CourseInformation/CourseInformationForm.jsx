@@ -42,13 +42,13 @@ export default function CourseInformationForm() {
       setLoading(false)
     }
 
+    // If we are editing, pre-populate the form
     if (editCourse) {
       setValue("courseTitle", course.courseName)
       setValue("courseShortDesc", course.courseDescription)
       setValue("coursePrice", course.price)
       setValue("courseTags", course.tag)
       setValue("courseBenefits", course.whatYouWillLearn)
-      // Fix: Ensure we set the ID for the dropdown to match
       setValue("courseCategory", course.category._id)
       setValue("courseRequirements", course.instructions)
       setValue("courseImage", course.thumbnail)
@@ -76,7 +76,10 @@ export default function CourseInformationForm() {
     return false
   }
 
+  // Handle Form Submission
   const onSubmit = async (data) => {
+    // console.log("SUBMITTING DATA...", data)
+
     if (editCourse) {
       if (isFormUpdated()) {
         const currentValues = getValues()
@@ -127,7 +130,7 @@ export default function CourseInformationForm() {
       return
     }
 
-    // Create New Course Logic
+    // Creating a New Course
     const formData = new FormData()
     formData.append("courseName", data.courseTitle)
     formData.append("courseDescription", data.courseShortDesc)
@@ -244,18 +247,18 @@ export default function CourseInformationForm() {
         )}
       </div>
 
-      {/* Course Tags - Custom Chip Input */}
+      {/* Tags (Custom Component with Add Button) */}
       <ChipInput
         label="Tags"
         name="courseTags"
-        placeholder="Enter Tags and press Enter or click Add"
+        placeholder="Enter Tags and press Enter or Add"
         register={register}
         errors={errors}
         setValue={setValue}
         getValues={getValues}
       />
 
-      {/* Course Thumbnail Image */}
+      {/* Course Thumbnail */}
       <Upload
         name="courseImage"
         label="Course Thumbnail"
@@ -283,7 +286,7 @@ export default function CourseInformationForm() {
         )}
       </div>
 
-      {/* Requirements/Instructions */}
+      {/* Requirements/Instructions (Custom Component with Add Button) */}
       <RequirementsField
         name="courseRequirements"
         label="Requirements/Instructions"
@@ -293,7 +296,7 @@ export default function CourseInformationForm() {
         getValues={getValues}
       />
 
-      {/* Navigation Buttons */}
+      {/* Form Buttons */}
       <div className="flex justify-end gap-x-2">
         {editCourse && (
           <button
