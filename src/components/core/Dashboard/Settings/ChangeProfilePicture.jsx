@@ -22,7 +22,6 @@ export default function ChangeProfilePicture() {
 
   const handleFileChange = (e) => {
     const file = e.target.files[0]
-    // console.log(file)
     if (file) {
       setImageFile(file)
       previewFile(file)
@@ -39,16 +38,19 @@ export default function ChangeProfilePicture() {
 
   const handleFileUpload = () => {
     try {
+      if (!imageFile) return; // Prevent upload if no file selected
+      
       console.log("uploading...")
       setLoading(true)
       const formData = new FormData()
       formData.append("displayPicture", imageFile)
-      // console.log("formdata", formData)
+      
       dispatch(updateDisplayPicture(token, formData)).then(() => {
         setLoading(false)
       })
     } catch (error) {
       console.log("ERROR MESSAGE - ", error.message)
+      setLoading(false)
     }
   }
 
@@ -57,6 +59,7 @@ export default function ChangeProfilePicture() {
       previewFile(imageFile)
     }
   }, [imageFile])
+
   return (
     <>
       <div className="flex items-center justify-between rounded-md border-[1px] border-richblack-700 bg-richblack-800 p-8 px-12 text-richblack-5">
@@ -78,6 +81,7 @@ export default function ChangeProfilePicture() {
               />
               <button
                 onClick={handleClick}
+                type="button"
                 disabled={loading}
                 className="cursor-pointer rounded-md bg-richblack-700 py-2 px-5 font-semibold text-richblack-50"
               >
@@ -85,7 +89,8 @@ export default function ChangeProfilePicture() {
               </button>
               <IconBtn
                 text={loading ? "Uploading..." : "Upload"}
-                onclick={handleFileUpload}
+                onClick={handleFileUpload} // Fixed: lowercase 'c' to uppercase 'C'
+                disabled={loading}
               >
                 {!loading && (
                   <FiUpload className="text-lg text-richblack-900" />
