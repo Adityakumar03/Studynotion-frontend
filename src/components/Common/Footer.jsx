@@ -121,7 +121,7 @@ const Footer = () => {
             ))}
           </div>
           <div className="text-center text-richblack-400">
-            Made with ❤️ CodeHelp © 2023 Studynotion
+            Made with ❤️ By Aditya for 🌍
           </div>
         </div>
       </div>
