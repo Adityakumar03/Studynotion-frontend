@@ -37,38 +37,36 @@ export default function CourseInformationForm() {
       setLoading(true)
       const categories = await fetchCourseCategories()
       if (categories.length > 0) {
-        // console.log("categories", categories)
         setCourseCategories(categories)
       }
       setLoading(false)
     }
-    // if form is in edit mode
+
     if (editCourse) {
-      // console.log("data populated", editCourse)
       setValue("courseTitle", course.courseName)
       setValue("courseShortDesc", course.courseDescription)
       setValue("coursePrice", course.price)
       setValue("courseTags", course.tag)
       setValue("courseBenefits", course.whatYouWillLearn)
-      setValue("courseCategory", course.category)
+      // Fix: Ensure we set the ID for the dropdown to match
+      setValue("courseCategory", course.category._id)
       setValue("courseRequirements", course.instructions)
       setValue("courseImage", course.thumbnail)
     }
-    getCategories()
 
+    getCategories()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const isFormUpdated = () => {
     const currentValues = getValues()
-    // console.log("changes after editing form values:", currentValues)
     if (
       currentValues.courseTitle !== course.courseName ||
       currentValues.courseShortDesc !== course.courseDescription ||
       currentValues.coursePrice !== course.price ||
       currentValues.courseTags.toString() !== course.tag.toString() ||
       currentValues.courseBenefits !== course.whatYouWillLearn ||
-      currentValues.courseCategory._id !== course.category._id ||
+      currentValues.courseCategory !== course.category._id ||
       currentValues.courseRequirements.toString() !==
         course.instructions.toString() ||
       currentValues.courseImage !== course.thumbnail
@@ -78,19 +76,12 @@ export default function CourseInformationForm() {
     return false
   }
 
-  //   handle next button click
   const onSubmit = async (data) => {
-    // console.log(data)
-
     if (editCourse) {
-      // const currentValues = getValues()
-      // console.log("changes after editing form values:", currentValues)
-      // console.log("now course:", course)
-      // console.log("Has Form Changed:", isFormUpdated())
       if (isFormUpdated()) {
         const currentValues = getValues()
         const formData = new FormData()
-        // console.log(data)
+
         formData.append("courseId", course._id)
         if (currentValues.courseTitle !== course.courseName) {
           formData.append("courseName", data.courseTitle)
@@ -107,7 +98,7 @@ export default function CourseInformationForm() {
         if (currentValues.courseBenefits !== course.whatYouWillLearn) {
           formData.append("whatYouWillLearn", data.courseBenefits)
         }
-        if (currentValues.courseCategory._id !== course.category._id) {
+        if (currentValues.courseCategory !== course.category._id) {
           formData.append("category", data.courseCategory)
         }
         if (
@@ -122,7 +113,7 @@ export default function CourseInformationForm() {
         if (currentValues.courseImage !== course.thumbnail) {
           formData.append("thumbnailImage", data.courseImage)
         }
-        // console.log("Edit Form data: ", formData)
+
         setLoading(true)
         const result = await editCourseDetails(formData, token)
         setLoading(false)
@@ -136,6 +127,7 @@ export default function CourseInformationForm() {
       return
     }
 
+    // Create New Course Logic
     const formData = new FormData()
     formData.append("courseName", data.courseTitle)
     formData.append("courseDescription", data.courseShortDesc)
@@ -146,6 +138,7 @@ export default function CourseInformationForm() {
     formData.append("status", COURSE_STATUS.DRAFT)
     formData.append("instructions", JSON.stringify(data.courseRequirements))
     formData.append("thumbnailImage", data.courseImage)
+
     setLoading(true)
     const result = await addCourseDetails(formData, token)
     if (result) {
@@ -177,6 +170,7 @@ export default function CourseInformationForm() {
           </span>
         )}
       </div>
+
       {/* Course Short Description */}
       <div className="flex flex-col space-y-2">
         <label className="text-sm text-richblack-5" htmlFor="courseShortDesc">
@@ -194,6 +188,7 @@ export default function CourseInformationForm() {
           </span>
         )}
       </div>
+
       {/* Course Price */}
       <div className="flex flex-col space-y-2">
         <label className="text-sm text-richblack-5" htmlFor="coursePrice">
@@ -220,6 +215,7 @@ export default function CourseInformationForm() {
           </span>
         )}
       </div>
+
       {/* Course Category */}
       <div className="flex flex-col space-y-2">
         <label className="text-sm text-richblack-5" htmlFor="courseCategory">
@@ -247,16 +243,18 @@ export default function CourseInformationForm() {
           </span>
         )}
       </div>
-      {/* Course Tags */}
+
+      {/* Course Tags - Custom Chip Input */}
       <ChipInput
         label="Tags"
         name="courseTags"
-        placeholder="Enter Tags and press Enter"
+        placeholder="Enter Tags and press Enter or click Add"
         register={register}
         errors={errors}
         setValue={setValue}
         getValues={getValues}
       />
+
       {/* Course Thumbnail Image */}
       <Upload
         name="courseImage"
@@ -266,6 +264,7 @@ export default function CourseInformationForm() {
         errors={errors}
         editData={editCourse ? course?.thumbnail : null}
       />
+
       {/* Benefits of the course */}
       <div className="flex flex-col space-y-2">
         <label className="text-sm text-richblack-5" htmlFor="courseBenefits">
@@ -283,6 +282,7 @@ export default function CourseInformationForm() {
           </span>
         )}
       </div>
+
       {/* Requirements/Instructions */}
       <RequirementsField
         name="courseRequirements"
@@ -292,7 +292,8 @@ export default function CourseInformationForm() {
         errors={errors}
         getValues={getValues}
       />
-      {/* Next Button */}
+
+      {/* Navigation Buttons */}
       <div className="flex justify-end gap-x-2">
         {editCourse && (
           <button
@@ -300,7 +301,7 @@ export default function CourseInformationForm() {
             disabled={loading}
             className={`flex cursor-pointer items-center gap-x-2 rounded-md bg-richblack-300 py-[8px] px-[20px] font-semibold text-richblack-900`}
           >
-            Continue Wihout Saving
+            Continue Without Saving
           </button>
         )}
         <IconBtn
