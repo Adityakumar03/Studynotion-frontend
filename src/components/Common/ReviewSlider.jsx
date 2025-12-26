@@ -29,6 +29,7 @@ function ReviewSlider() {
         )
         if (data?.success) {
           const finalData = data?.data
+          // Duplicate data for smooth loop if items are fewer than 8
           if (finalData.length > 0 && finalData.length < 8) {
             setReviews([...finalData, ...finalData])
           } else {
@@ -47,7 +48,7 @@ function ReviewSlider() {
   if (loading) {
     return (
       <div className="flex h-[150px] items-center justify-center text-white">
-        <div className="spinner"></div>
+        <div className="w-10 h-10 border-4 border-yellow-100 border-t-transparent rounded-full animate-spin"></div>
       </div>
     )
   }
@@ -65,23 +66,28 @@ function ReviewSlider() {
           }}
           pagination={{
             clickable: true,
+            dynamicBullets: true,
           }}
           breakpoints={{
+            // Mobile: 2 slides, no "peek"
             320: { slidesPerView: 2, spaceBetween: 10 },
+            // Tablet: 2 slides
             640: { slidesPerView: 2, spaceBetween: 15 },
+            // Desktop: 3 slides
             1024: { slidesPerView: 3, spaceBetween: 20 },
+            // Large Desktop: 4 slides
             1280: { slidesPerView: 4, spaceBetween: 25 },
           }}
           modules={[FreeMode, Pagination, Autoplay]}
-          className="w-full pb-12"
+          // pb-14 creates the dedicated space for dots below the cards
+          className="w-full pb-14"
         >
           {reviews.map((review, i) => (
-            <SwiperSlide key={review?._id || i} className="h-auto">
-              {/* Card Container with Fixed Height */}
+            <SwiperSlide key={review?._id || i}>
               <div className="flex flex-col gap-3 bg-richblack-800 p-4 text-richblack-25 rounded-lg border border-richblack-700 
-                              h-[200px] md:h-[230px] w-full transition-all duration-200 hover:scale-[1.02]">
-                
-                {/* 1. Header Section (Fixed height for alignment) */}
+                              h-[210px] md:h-[240px] w-full transition-all duration-200 hover:bg-richblack-900">
+
+                {/* Header Section */}
                 <div className="flex items-center gap-3 h-[40px] shrink-0">
                   <img
                     src={review?.user?.image || `https://api.dicebear.com/5.x/initials/svg?seed=${review?.user?.firstName}`}
@@ -98,14 +104,14 @@ function ReviewSlider() {
                   </div>
                 </div>
 
-                {/* 2. Review Text Section (Scrollable or Clamped) */}
+                {/* Review Text Area (fills remaining space) */}
                 <div className="flex-grow overflow-hidden">
-                   <p className="text-[12px] md:text-[14px] font-medium text-richblack-25 leading-snug italic line-clamp-4">
+                  <p className="text-[12px] md:text-[14px] font-medium text-richblack-25 leading-snug italic line-clamp-4">
                     "{review?.review}"
                   </p>
                 </div>
 
-                {/* 3. Footer Section (Pinned to bottom via mt-auto) */}
+                {/* Footer Section */}
                 <div className="flex items-center gap-2 mt-auto pt-2 border-t border-richblack-700">
                   <span className="font-semibold text-yellow-100 text-[14px]">
                     {review.rating.toFixed(1)}
@@ -127,6 +133,24 @@ function ReviewSlider() {
           ))}
         </Swiper>
       </div>
+
+      {/* CSS Overrides to force dots to the bottom of the padding gutter */}
+      <style dangerouslySetInnerHTML={{
+        __html: `
+        .swiper-pagination {
+          bottom: 0px !important;
+          position: absolute !important;
+        }
+        .swiper-pagination-bullet {
+          background: #424854 !important; /* richblack-600 */
+          opacity: 1 !important;
+        }
+        .swiper-pagination-bullet-active {
+          background: #FFD60A !important; /* yellow-50 */
+          width: 20px !important;
+          border-radius: 4px !important;
+        }
+      `}} />
     </div>
   )
 }
