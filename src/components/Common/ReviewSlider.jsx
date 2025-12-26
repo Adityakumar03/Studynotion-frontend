@@ -62,12 +62,12 @@ function ReviewSlider() {
           breakpoints={{
             // Mobile (Small)
             320: {
-              slidesPerView: 1.2,
+              slidesPerView: 2,
               spaceBetween: 10,
             },
             // Tablet
             640: {
-              slidesPerView: 2.2,
+              slidesPerView: 3,
               spaceBetween: 15,
             },
             // Desktop (Medium)
