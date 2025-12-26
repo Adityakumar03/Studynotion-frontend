@@ -191,6 +191,7 @@ export default function SubSectionModal({
           {!view && (
             <div className="flex justify-end">
               <IconBtn
+                type="submit"
                 disabled={loading}
                 text={loading ? "Loading.." : edit ? "Save Changes" : "Save"}
               />
