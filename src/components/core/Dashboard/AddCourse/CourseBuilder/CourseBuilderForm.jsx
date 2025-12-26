@@ -145,6 +145,7 @@ export default function CourseBuilderForm() {
 
       <div className="flex justify-end gap-x-3">
         <button
+          type="button"
           onClick={goBack}
           className="flex cursor-pointer items-center gap-x-2 rounded-md bg-richblack-300 py-[8px] px-[20px] font-semibold text-richblack-900"
         >
@@ -154,7 +155,7 @@ export default function CourseBuilderForm() {
           type="button"
           disabled={loading}
           text="Next"
-          onclick={goToNext}>
+          onClick={goToNext}>
           <MdNavigateNext />
         </IconBtn>
       </div>
