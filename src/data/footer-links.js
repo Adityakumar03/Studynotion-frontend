@@ -2,7 +2,7 @@ export const FooterLink2 = [
   {
     title: "Subjects",
     links: [
-      { title: "Al", link: "/al" },
+      { title: "AI", link: "/ai" }, // Fixed typo from Al to AI
       { title: "Cloud Computing", link: "/cloud-computing" },
       { title: "Code Foundations", link: "/code-foundations" },
       { title: "Computer Science", link: "/computer-science" },
@@ -25,7 +25,7 @@ export const FooterLink2 = [
     title: "Languages",
     links: [
       { title: "Bash", link: "/bash" },
-      { title: "C++", link: "/c++" },
+      { title: "C++", link: "/cpp" }, // Changed to /cpp for cleaner URL handling
       { title: "C#", link: "/csharp" },
       { title: "Go", link: "/go" },
       { title: "HTML & CSS", link: "/html-css" },
@@ -43,13 +43,12 @@ export const FooterLink2 = [
   {
     title: "Career building",
     links: [
-        {title: "Career paths", link: "/career-paths"},
-        {title: "Career services", link: "/career-services"},
-        {title: "Interview prep", link: "/interview-prep"},
-        {title: "Professional certification", link: "/professional-certification"},
-        {title: "-", link: "/hi"},
-        {title: "Full Catalog", link: "/full-catalog"},
-        {title: "Beta Content", link: "/beta-content"}
-    ]
-  }
+      { title: "Career paths", link: "/career-paths" },
+      { title: "Career services", link: "/career-services" },
+      { title: "Interview prep", link: "/interview-prep" },
+      { title: "Professional certification", link: "/professional-certification" },
+      { title: "Full Catalog", link: "/full-catalog" },
+      { title: "Beta Content", link: "/beta-content" },
+    ],
+  },
 ];
