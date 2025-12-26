@@ -1,16 +1,15 @@
 import React, { useEffect, useState } from "react"
 import ReactStars from "react-rating-stars-component"
 import { Swiper, SwiperSlide } from "swiper/react"
+import { FaStar } from "react-icons/fa"
 
 // Swiper styles
 import "swiper/css"
 import "swiper/css/free-mode"
 import "swiper/css/pagination"
-
 import "../../App.css"
-import { FaStar } from "react-icons/fa"
 
-// ✅ FIXED IMPORT
+// Swiper modules
 import { Autoplay, FreeMode, Pagination } from "swiper/modules"
 
 // API
@@ -23,34 +22,71 @@ function ReviewSlider() {
 
   useEffect(() => {
     ;(async () => {
-      const { data } = await apiConnector(
-        "GET",
-        ratingsEndpoints.REVIEWS_DETAILS_API
-      )
-      if (data?.success) {
-        setReviews(data?.data)
+      try {
+        const { data } = await apiConnector(
+          "GET",
+          ratingsEndpoints.REVIEWS_DETAILS_API
+        )
+        if (data?.success) {
+          const finalData = data?.data;
+          
+          // FIX: If there are too few slides for a loop (less than 8), 
+          // we duplicate them to ensure the loop is always smooth and warning-free.
+          if (finalData.length > 0 && finalData.length < 8) {
+            setReviews([...finalData, ...finalData]);
+          } else {
+            setReviews(finalData);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching reviews:", error)
       }
     })()
   }, [])
 
   return (
-    <div className="text-white">
-      <div className="my-[50px] h-[184px] max-w-maxContentTab lg:max-w-maxContent">
+    <div className="text-white w-full">
+      <div className="my-[50px] h-auto max-w-maxContentTab lg:max-w-maxContent mx-auto">
         <Swiper
-          slidesPerView={4}
-          spaceBetween={25}
-          loop={true}
+          // Key forces refresh when data loads
+          key={reviews.length}
+          // Loop is now safe because of our duplication logic above
+          loop={reviews.length > 1}
+          spaceBetween={20}
           freeMode={true}
           autoplay={{
             delay: 2500,
             disableOnInteraction: false,
+          }}
+          // RESPONSIVE BREAKPOINTS
+          breakpoints={{
+            // Mobile (Small)
+            320: {
+              slidesPerView: 1.2,
+              spaceBetween: 10,
+            },
+            // Tablet
+            640: {
+              slidesPerView: 2.2,
+              spaceBetween: 15,
+            },
+            // Desktop (Medium)
+            1024: {
+              slidesPerView: 3,
+              spaceBetween: 20,
+            },
+            // Large Desktop
+            1280: {
+              slidesPerView: 4,
+              spaceBetween: 25,
+            },
           }}
           modules={[FreeMode, Pagination, Autoplay]}
           className="w-full"
         >
           {reviews.map((review, i) => (
             <SwiperSlide key={i}>
-              <div className="flex flex-col gap-3 bg-richblack-800 p-3 text-[14px] text-richblack-25">
+              <div className="flex flex-col gap-3 bg-richblack-800 p-4 text-[14px] text-richblack-25 rounded-lg min-h-[180px] border border-richblack-700">
                 <div className="flex items-center gap-4">
                   <img
                     src={
@@ -58,8 +94,8 @@ function ReviewSlider() {
                         ? review.user.image
                         : `https://api.dicebear.com/5.x/initials/svg?seed=${review?.user?.firstName} ${review?.user?.lastName}`
                     }
-                    alt=""
-                    className="h-9 w-9 rounded-full object-cover"
+                    alt={`${review?.user?.firstName} profile`}
+                    className="h-10 w-10 rounded-full object-cover border border-richblack-600"
                   />
                   <div className="flex flex-col">
                     <h1 className="font-semibold text-richblack-5">
@@ -71,7 +107,7 @@ function ReviewSlider() {
                   </div>
                 </div>
 
-                <p className="font-medium text-richblack-25">
+                <p className="font-medium text-richblack-25 leading-relaxed">
                   {review?.review.split(" ").length > truncateWords
                     ? `${review.review
                         .split(" ")
@@ -80,7 +116,7 @@ function ReviewSlider() {
                     : review.review}
                 </p>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 mt-auto">
                   <h3 className="font-semibold text-yellow-100">
                     {review.rating.toFixed(1)}
                   </h3>
