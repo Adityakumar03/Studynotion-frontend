@@ -130,7 +130,7 @@ function Navbar() {
           </div>
 
           <button 
-            className="md:hidden cursor-pointer z-[2000] text-richblack-100 p-1" 
+            className="md:hidden cursor-pointer z-[2000] text-richblack-100 p-1 transition-transform duration-300 active:rotate-90" 
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
             {isMobileMenuOpen ? <AiOutlineClose fontSize={30} /> : <HiMenuAlt3 fontSize={30} />}
@@ -144,75 +144,82 @@ function Navbar() {
         onClick={() => setIsMobileMenuOpen(false)}
       >
         <div 
-          className={`absolute right-0 top-0 h-[100dvh] w-[300px] bg-richblack-900 shadow-[-10px_0_40px_rgba(0,0,0,0.8)] transition-transform duration-300 ease-in-out ${isMobileMenuOpen ? "translate-x-0" : "translate-x-full"}`} 
+          className={`absolute right-0 top-0 h-[100dvh] w-[260px] bg-richblack-900 shadow-[-10px_0_40px_rgba(0,0,0,0.8)] transition-transform duration-300 ease-in-out ${isMobileMenuOpen ? "translate-x-0" : "translate-x-full"}`} 
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="flex flex-col h-full overflow-y-auto px-6 py-10">
+          <div className="flex flex-col h-full overflow-y-auto px-4 py-8">
             
-            {/* User Info */}
+            {/* User Info Section */}
             {token && user && (
-              <div className="flex items-center gap-x-4 pb-8 mb-6 border-b border-richblack-800 mt-6">
-                <img src={user?.image} alt="user" className="aspect-square w-[55px] rounded-full object-cover border-2 border-yellow-50" />
+              <div className={`flex items-center gap-x-3 pb-6 mb-4 border-b border-richblack-800 mt-8 ${isMobileMenuOpen ? "animate-slide-in" : ""}`} style={{ animationDelay: '0.1s' }}>
+                <img src={user?.image} alt="user" className="aspect-square w-[45px] rounded-full object-cover border-2 border-yellow-50" />
                 <div className="flex flex-col overflow-hidden">
-                  <p className="text-richblack-5 text-lg font-bold truncate">{user?.firstName}</p>
-                  <p className="text-sm text-richblack-400 truncate">{user?.email}</p>
+                  <p className="text-richblack-5 text-base font-bold truncate">{user?.firstName}</p>
+                  <p className="text-[12px] text-richblack-400 truncate">{user?.email}</p>
                 </div>
               </div>
             )}
 
-            {/* Navigation */}
-            <div className="flex flex-col gap-y-4">
+            {/* Navigation Links */}
+            <div className="flex flex-col gap-y-2">
               {NavbarLinks.map((link, index) => (
-                <div key={index}>
+                <div 
+                  key={index} 
+                  className={isMobileMenuOpen ? "animate-slide-in" : ""} 
+                  style={{ animationDelay: `${(index + 2) * 0.1}s` }}
+                >
                   {link.title === "Catalog" ? (
                     <div className="flex flex-col items-start w-full">
                       <button 
                         className="flex items-center justify-between text-richblack-25 py-3 w-full"
                         onClick={() => setIsCatalogOpen(!isCatalogOpen)}
                       >
-                        <p className="text-xl">{link.title}</p>
-                        <BsChevronDown className={`text-xl transition-transform duration-200 ${isCatalogOpen ? "rotate-180" : ""}`} />
+                        <p className="text-lg">{link.title}</p>
+                        <BsChevronDown className={`text-base transition-transform duration-200 ${isCatalogOpen ? "rotate-180" : ""}`} />
                       </button>
                       {isCatalogOpen && (
-                        <div className="flex flex-col items-start gap-y-3 pl-6 mt-2 border-l-2 border-richblack-700 w-full mb-2">
+                        <div className="flex flex-col items-start gap-y-3 pl-4 mt-1 border-l border-richblack-700 w-full mb-2">
                           {subLinks.map((sub, i) => (
-                            <Link key={i} to={`/catalog/${sub.name.split(" ").join("-").toLowerCase()}`} className="text-richblack-200 text-lg hover:text-yellow-50">{sub.name}</Link>
+                            <Link key={i} to={`/catalog/${sub.name.split(" ").join("-").toLowerCase()}`} className="text-richblack-200 text-base hover:text-yellow-50">{sub.name}</Link>
                           ))}
                         </div>
                       )}
                     </div>
                   ) : (
-                    <Link to={link.path} className={`text-xl block py-3 w-full ${matchRoute(link.path) ? "text-yellow-25" : "text-richblack-25"}`}>{link.title}</Link>
+                    <Link to={link.path} className={`text-lg block py-3 w-full ${matchRoute(link.path) ? "text-yellow-25" : "text-richblack-25"}`}>{link.title}</Link>
                   )}
                 </div>
               ))}
 
               {token && (
-                <div className="flex flex-col items-start w-full mt-4">
-                  <hr className="border-richblack-800 w-full mb-6" />
+                <div 
+                  className={`flex flex-col items-start w-full mt-2 ${isMobileMenuOpen ? "animate-slide-in" : ""}`}
+                  style={{ animationDelay: `${(NavbarLinks.length + 2) * 0.1}s` }}
+                >
+                  <hr className="border-richblack-800 w-full mb-4" />
                   
-                  {/* Improved Dashboard Button */}
                   <button 
-                    className="flex items-center justify-between text-yellow-50 py-4 w-full group hover:bg-richblack-800/50 rounded-xl px-2 transition-all" 
+                    className="flex items-center justify-between text-yellow-50 py-3 w-full group hover:bg-richblack-800/50 rounded-lg px-2 transition-all" 
                     onClick={() => setIsDashboardOpen(!isDashboardOpen)}
                   >
-                    <div className="flex items-center gap-x-4">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-yellow-50 text-richblack-900 shadow-[0px_0px_20px_rgba(255,214,10,0.3)]">
-                        <AiOutlineDashboard className="text-2xl" />
+                    <div className="flex items-center gap-x-3">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-yellow-50 text-richblack-900 shadow-[0px_0px_15px_rgba(255,214,10,0.2)]">
+                        <AiOutlineDashboard className="text-xl" />
                       </div>
-                      <p className="text-xl font-bold tracking-wide">Dashboard</p>
+                      <p className="text-lg font-bold">Dashboard</p>
                     </div>
-                    <BsChevronDown className={`text-xl transition-transform duration-300 ${isDashboardOpen ? "rotate-180" : ""}`} />
+                    <BsChevronDown className={`text-base transition-transform duration-300 ${isDashboardOpen ? "rotate-180" : ""}`} />
                   </button>
 
                   {isDashboardOpen && (
-                    <div className="flex flex-col items-start gap-y-4 pl-8 mt-4 border-l-2 border-yellow-50/20 mb-6 ml-6 w-full">
-                      {sidebarLinks.map((link) => (
+                    <div className="flex flex-col items-start gap-y-3 pl-6 mt-3 border-l border-yellow-50/20 mb-4 ml-5 w-full">
+                      {sidebarLinks.map((link, i) => (
                         (!link.type || user?.accountType === link.type) && (
                           <Link 
                             key={link.id} 
                             to={link.path} 
-                            className={`text-lg py-2 transition-all w-full ${matchRoute(link.path) ? "text-yellow-50 font-bold" : "text-richblack-200 hover:text-richblack-5"}`}
+                            className={`text-base py-1 transition-all w-full animate-slide-in ${matchRoute(link.path) ? "text-yellow-50 font-bold" : "text-richblack-300 hover:text-richblack-5"}`}
+                            style={{ animationDelay: `${i * 0.05}s` }}
                           >
                             {link.name}
                           </Link>
@@ -224,21 +231,19 @@ function Navbar() {
               )}
             </div>
 
-            {/* Logout / Auth Bottom */}
-            <div className="mt-auto pb-6">
+            {/* Bottom Section: Auth or Logout */}
+            <div className={`mt-auto pb-4 ${isMobileMenuOpen ? "animate-slide-in" : ""}`} style={{ animationDelay: '0.8s' }}>
               {!token ? (
-                <div className="flex flex-col gap-y-4">
-                  <Link to="/login"><button className={`${loginStyle} w-full py-4 text-xl`}>Log in</button></Link>
-                  <Link to="/signup"><button className={`${signupStyle} w-full py-4 text-xl`}>Sign up</button></Link>
+                <div className="flex flex-col gap-y-3">
+                  <Link to="/login"><button className={`${loginStyle} w-full py-3 text-lg`}>Log in</button></Link>
+                  <Link to="/signup"><button className={`${signupStyle} w-full py-3 text-lg`}>Sign up</button></Link>
                 </div>
               ) : (
                 <button 
                   onClick={() => setShowLogoutModal(true)} 
-                  className="group flex w-full items-center justify-center gap-x-4 rounded-2xl border border-pink-700/50 bg-pink-900/20 px-6 py-5 text-xl font-bold text-pink-200 transition-all hover:bg-pink-900/40 active:scale-95 shadow-[0px_4px_20px_rgba(255,100,100,0.2)]"
+                  className="group flex w-full items-center justify-center gap-x-3 rounded-xl border border-pink-700/50 bg-pink-900/20 px-4 py-4 text-lg font-bold text-pink-200 transition-all hover:bg-pink-900/40 active:scale-95 shadow-[0px_4px_15px_rgba(255,100,100,0.15)]"
                 >
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-pink-500/20 text-pink-200">
-                    <AiOutlineLogout className="text-2xl" />
-                  </div>
+                  <AiOutlineLogout className="text-xl" />
                   <span>Logout</span>
                 </button>
               )}
@@ -250,16 +255,16 @@ function Navbar() {
       {/* --- LOGOUT MODAL --- */}
       {showLogoutModal && (
         <div className="fixed inset-0 z-[3000] grid place-items-center px-4 bg-white/10 backdrop-blur-md">
-          <div className="w-full max-w-[380px] rounded-3xl border border-richblack-700 bg-richblack-800 p-8 shadow-[0px_0px_50px_rgba(0,0,0,0.7)]">
+          <div className="w-full max-w-[350px] rounded-3xl border border-richblack-700 bg-richblack-800 p-8 shadow-[0px_0px_50px_rgba(0,0,0,0.7)]">
             <div className="flex flex-col items-center text-center">
               <div className="mb-6 rounded-full bg-pink-900/40 p-4">
-                <AiOutlineExclamationCircle className="text-5xl text-pink-200" />
+                <AiOutlineExclamationCircle className="text-4xl text-pink-200" />
               </div>
-              <p className="text-3xl font-bold text-richblack-5">Are you sure?</p>
-              <p className="mt-3 mb-8 text-richblack-300 text-lg leading-relaxed">You will be logged out of your current session.</p>
-              <div className="flex w-full flex-col gap-y-4">
-                <button onClick={handleLogout} className="w-full rounded-xl bg-pink-200 py-4 font-black text-richblack-900 text-lg hover:bg-pink-300 transition-all">Logout Now</button>
-                <button onClick={() => setShowLogoutModal(false)} className="w-full rounded-xl bg-richblack-700 py-4 font-bold text-richblack-5 text-lg hover:bg-richblack-600 transition-all">Cancel</button>
+              <p className="text-2xl font-bold text-richblack-5">Are you sure?</p>
+              <p className="mt-2 mb-6 text-richblack-300 text-base">You will be logged out of your current session.</p>
+              <div className="flex w-full flex-col gap-y-3">
+                <button onClick={handleLogout} className="w-full rounded-xl bg-pink-200 py-3 font-black text-richblack-900 text-base hover:bg-pink-300 transition-all">Logout Now</button>
+                <button onClick={() => setShowLogoutModal(false)} className="w-full rounded-xl bg-richblack-700 py-3 font-bold text-richblack-5 text-base hover:bg-richblack-600 transition-all">Cancel</button>
               </div>
             </div>
           </div>
