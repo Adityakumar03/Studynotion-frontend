@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { Outlet, useParams } from "react-router-dom"
-import { HiMenuAlt2 } from "react-icons/hi" // Standard menu icon
+import { HiMenuAlt2 } from "react-icons/hi"
 
 import CourseReviewModal from "../components/core/ViewCourse/CourseReviewModal"
 import VideoDetailsSidebar from "../components/core/ViewCourse/VideoDetailsSidebar"
@@ -18,7 +18,7 @@ export default function ViewCourse() {
   const { token } = useSelector((state) => state.auth)
   const dispatch = useDispatch()
   const [reviewModal, setReviewModal] = useState(false)
-  const [sidebarActive, setSidebarActive] = useState(false) // State for mobile drawer
+  const [sidebarActive, setSidebarActive] = useState(false)
 
   useEffect(() => {
     ;(async () => {
@@ -38,44 +38,50 @@ export default function ViewCourse() {
     <>
       <div className="relative flex min-h-[calc(100vh-3.5rem)] flex-col md:flex-row">
         
-        {/* Mobile Header (Only visible on small screens) */}
-        <div className="flex h-[50px] items-center border-b border-richblack-700 px-4 md:hidden">
+        {/* Mobile Top Header */}
+        <div className="flex h-[50px] items-center justify-between border-b border-richblack-700 bg-richblack-900 px-4 md:hidden relative z-[50]">
             <button 
                 onClick={() => setSidebarActive(true)}
                 className="text-richblack-100 text-2xl"
             >
                 <HiMenuAlt2 />
             </button>
-            <span className="ml-4 font-semibold text-richblack-50">Course Content</span>
+            <span className="font-semibold text-richblack-50 text-sm">Course Content</span>
         </div>
 
-        {/* Sidebar Wrapper */}
-        <div className={`
-            fixed inset-0 z-[1000] transition-all duration-300 md:relative md:inset-auto md:z-0 md:block
-            ${sidebarActive ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
-        `}>
+        {/* Sidebar Container - FIXED: invisible when closed so it doesn't block clicks */}
+        <div 
+          className={`fixed inset-0 z-[1500] transition-all duration-300 md:relative md:inset-auto md:z-0 md:block 
+          ${sidebarActive ? "visible" : "invisible md:visible"}`}
+        >
             {/* Backdrop for mobile */}
             <div 
-                className="fixed inset-0 bg-black bg-opacity-50 md:hidden" 
+                className={`fixed inset-0 bg-black bg-opacity-50 transition-opacity duration-300 md:hidden ${
+                  sidebarActive ? "opacity-100" : "opacity-0 pointer-events-none"
+                }`} 
                 onClick={() => setSidebarActive(false)}
             />
             
-            <div className="relative h-full w-[250px] md:w-[320px]">
+            {/* Sidebar Content */}
+            <div className={`absolute left-0 top-0 h-full w-[250px] bg-richblack-800 transition-transform duration-300 md:relative md:translate-x-0 md:w-[320px] ${
+              sidebarActive ? "translate-x-0" : "-translate-x-full"
+            }`}>
                 <VideoDetailsSidebar 
                     setReviewModal={setReviewModal} 
-                    setSidebarActive={setSidebarActive} // Pass to close on selection
+                    setSidebarActive={setSidebarActive} 
                 />
             </div>
         </div>
 
         {/* Main Content */}
-        <div className="h-[calc(100vh-3.5rem)] flex-1 overflow-auto">
-          <div className="mx-6 py-10">
+        <div className="h-[calc(100vh-3.5rem)] flex-1 overflow-auto bg-richblack-900">
+          <div className="mx-auto w-11/12 max-w-[1000px] py-10">
             <Outlet />
           </div>
         </div>
       </div>
       
+      {/* Review Modal */}
       {reviewModal && <CourseReviewModal setReviewModal={setReviewModal} />}
     </>
   )
