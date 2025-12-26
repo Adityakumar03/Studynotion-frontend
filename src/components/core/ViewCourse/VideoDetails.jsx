@@ -25,21 +25,19 @@ const VideoDetails = () => {
   const [videoEnded, setVideoEnded] = useState(false)
   const [loading, setLoading] = useState(false)
 
+  // Fetch video details and reset state on URL change
   useEffect(() => {
     ;(async () => {
       if (!courseSectionData.length) return
       if (!courseId && !sectionId && !subSectionId) {
         navigate(`/dashboard/enrolled-courses`)
       } else {
-        // console.log("courseSectionData", courseSectionData)
         const filteredData = courseSectionData.filter(
           (course) => course._id === sectionId
         )
-        // console.log("filteredData", filteredData)
         const filteredVideoData = filteredData?.[0]?.subSection.filter(
           (data) => data._id === subSectionId
         )
-        // console.log("filteredVideoData", filteredVideoData)
         setVideoData(filteredVideoData[0])
         setPreviewSource(courseEntireData.thumbnail)
         setVideoEnded(false)
@@ -47,39 +45,45 @@ const VideoDetails = () => {
     })()
   }, [courseSectionData, courseEntireData, location.pathname])
 
-  // check if the lecture is the first video of the course
+  // Logic to check if current video is the first
   const isFirstVideo = () => {
     const currentSectionIndx = courseSectionData.findIndex(
       (data) => data._id === sectionId
     )
-
     const currentSubSectionIndx = courseSectionData[
       currentSectionIndx
     ].subSection.findIndex((data) => data._id === subSectionId)
 
-    if (currentSectionIndx === 0 && currentSubSectionIndx === 0) {
-      return true
-    } else {
-      return false
-    }
+    return currentSectionIndx === 0 && currentSubSectionIndx === 0
   }
 
-  // go to the next video
-  const goToNextVideo = () => {
-    // console.log(courseSectionData)
-
+  // Logic to check if current video is the last
+  const isLastVideo = () => {
     const currentSectionIndx = courseSectionData.findIndex(
       (data) => data._id === sectionId
     )
-
     const noOfSubsections =
       courseSectionData[currentSectionIndx].subSection.length
-
     const currentSubSectionIndx = courseSectionData[
       currentSectionIndx
     ].subSection.findIndex((data) => data._id === subSectionId)
 
-    // console.log("no of subsections", noOfSubsections)
+    return (
+      currentSectionIndx === courseSectionData.length - 1 &&
+      currentSubSectionIndx === noOfSubsections - 1
+    )
+  }
+
+  // Navigation: Next Video
+  const goToNextVideo = () => {
+    const currentSectionIndx = courseSectionData.findIndex(
+      (data) => data._id === sectionId
+    )
+    const noOfSubsections =
+      courseSectionData[currentSectionIndx].subSection.length
+    const currentSubSectionIndx = courseSectionData[
+      currentSectionIndx
+    ].subSection.findIndex((data) => data._id === subSectionId)
 
     if (currentSubSectionIndx !== noOfSubsections - 1) {
       const nextSubSectionId =
@@ -99,37 +103,11 @@ const VideoDetails = () => {
     }
   }
 
-  // check if the lecture is the last video of the course
-  const isLastVideo = () => {
-    const currentSectionIndx = courseSectionData.findIndex(
-      (data) => data._id === sectionId
-    )
-
-    const noOfSubsections =
-      courseSectionData[currentSectionIndx].subSection.length
-
-    const currentSubSectionIndx = courseSectionData[
-      currentSectionIndx
-    ].subSection.findIndex((data) => data._id === subSectionId)
-
-    if (
-      currentSectionIndx === courseSectionData.length - 1 &&
-      currentSubSectionIndx === noOfSubsections - 1
-    ) {
-      return true
-    } else {
-      return false
-    }
-  }
-
-  // go to the previous video
+  // Navigation: Previous Video
   const goToPrevVideo = () => {
-    // console.log(courseSectionData)
-
     const currentSectionIndx = courseSectionData.findIndex(
       (data) => data._id === sectionId
     )
-
     const currentSubSectionIndx = courseSectionData[
       currentSectionIndx
     ].subSection.findIndex((data) => data._id === subSectionId)
@@ -156,6 +134,7 @@ const VideoDetails = () => {
     }
   }
 
+  // Handle Mark as Complete
   const handleLectureCompletion = async () => {
     setLoading(true)
     const res = await markLectureAsComplete(
@@ -185,29 +164,32 @@ const VideoDetails = () => {
           src={videoData?.videoUrl}
         >
           <BigPlayButton position="center" />
-          {/* Render When Video Ends */}
+          
+          {/* OVERLAY SECTION 
+              Fixed for Mobile: Added z-[1000] and pointer-events-auto
+          */}
           {videoEnded && (
             <div
               style={{
                 backgroundImage:
-                  "linear-gradient(to top, rgb(0, 0, 0), rgba(0,0,0,0.7), rgba(0,0,0,0.5), rgba(0,0,0,0.1)",
+                  "linear-gradient(to top, rgb(0, 0, 0), rgba(0,0,0,0.7), rgba(0,0,0,0.5), rgba(0,0,0,0.1))",
               }}
-              className="full absolute inset-0 z-[100] grid h-full place-content-center font-inter"
+              className="absolute inset-0 z-[1000] grid h-full place-content-center font-inter pointer-events-auto"
             >
               {!completedLectures.includes(subSectionId) && (
                 <IconBtn
                   disabled={loading}
-                  onclick={() => handleLectureCompletion()}
+                  onClick={() => handleLectureCompletion()} 
                   text={!loading ? "Mark As Completed" : "Loading..."}
                   customClasses="text-xl max-w-max px-4 mx-auto"
                 />
               )}
               <IconBtn
                 disabled={loading}
-                onclick={() => {
+                onClick={() => { 
                   if (playerRef?.current) {
-                    // set the current time of the video to 0
-                    playerRef?.current?.seek(0)
+                    playerRef.current.seek(0)
+                    playerRef.current.play() 
                     setVideoEnded(false)
                   }
                 }}
@@ -219,7 +201,7 @@ const VideoDetails = () => {
                   <button
                     disabled={loading}
                     onClick={goToPrevVideo}
-                    className="blackButton"
+                    className="blackButton cursor-pointer"
                   >
                     Prev
                   </button>
@@ -228,7 +210,7 @@ const VideoDetails = () => {
                   <button
                     disabled={loading}
                     onClick={goToNextVideo}
-                    className="blackButton"
+                    className="blackButton cursor-pointer"
                   >
                     Next
                   </button>
@@ -246,4 +228,3 @@ const VideoDetails = () => {
 }
 
 export default VideoDetails
-// video
