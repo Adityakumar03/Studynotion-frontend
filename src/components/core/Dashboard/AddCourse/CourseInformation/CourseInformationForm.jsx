@@ -42,7 +42,6 @@ export default function CourseInformationForm() {
       setLoading(false)
     }
 
-    // If we are editing, pre-populate the form
     if (editCourse) {
       setValue("courseTitle", course.courseName)
       setValue("courseShortDesc", course.courseDescription)
@@ -55,67 +54,39 @@ export default function CourseInformationForm() {
     }
 
     getCategories()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const isFormUpdated = () => {
     const currentValues = getValues()
-    if (
+    return (
       currentValues.courseTitle !== course.courseName ||
       currentValues.courseShortDesc !== course.courseDescription ||
       currentValues.coursePrice !== course.price ||
       currentValues.courseTags.toString() !== course.tag.toString() ||
       currentValues.courseBenefits !== course.whatYouWillLearn ||
       currentValues.courseCategory !== course.category._id ||
-      currentValues.courseRequirements.toString() !==
-        course.instructions.toString() ||
+      currentValues.courseRequirements.toString() !== course.instructions.toString() ||
       currentValues.courseImage !== course.thumbnail
-    ) {
-      return true
-    }
-    return false
+    )
   }
 
-  // Handle Form Submission
   const onSubmit = async (data) => {
-    // console.log("SUBMITTING DATA...", data)
-
     if (editCourse) {
       if (isFormUpdated()) {
         const currentValues = getValues()
         const formData = new FormData()
 
         formData.append("courseId", course._id)
-        if (currentValues.courseTitle !== course.courseName) {
-          formData.append("courseName", data.courseTitle)
+        if (currentValues.courseTitle !== course.courseName) formData.append("courseName", data.courseTitle)
+        if (currentValues.courseShortDesc !== course.courseDescription) formData.append("courseDescription", data.courseShortDesc)
+        if (currentValues.coursePrice !== course.price) formData.append("price", data.coursePrice)
+        if (currentValues.courseTags.toString() !== course.tag.toString()) formData.append("tag", JSON.stringify(data.courseTags))
+        if (currentValues.courseBenefits !== course.whatYouWillLearn) formData.append("whatYouWillLearn", data.courseBenefits)
+        if (currentValues.courseCategory !== course.category._id) formData.append("category", data.courseCategory)
+        if (currentValues.courseRequirements.toString() !== course.instructions.toString()) {
+          formData.append("instructions", JSON.stringify(data.courseRequirements))
         }
-        if (currentValues.courseShortDesc !== course.courseDescription) {
-          formData.append("courseDescription", data.courseShortDesc)
-        }
-        if (currentValues.coursePrice !== course.price) {
-          formData.append("price", data.coursePrice)
-        }
-        if (currentValues.courseTags.toString() !== course.tag.toString()) {
-          formData.append("tag", JSON.stringify(data.courseTags))
-        }
-        if (currentValues.courseBenefits !== course.whatYouWillLearn) {
-          formData.append("whatYouWillLearn", data.courseBenefits)
-        }
-        if (currentValues.courseCategory !== course.category._id) {
-          formData.append("category", data.courseCategory)
-        }
-        if (
-          currentValues.courseRequirements.toString() !==
-          course.instructions.toString()
-        ) {
-          formData.append(
-            "instructions",
-            JSON.stringify(data.courseRequirements)
-          )
-        }
-        if (currentValues.courseImage !== course.thumbnail) {
-          formData.append("thumbnailImage", data.courseImage)
-        }
+        if (currentValues.courseImage !== course.thumbnail) formData.append("thumbnailImage", data.courseImage)
 
         setLoading(true)
         const result = await editCourseDetails(formData, token)
@@ -130,7 +101,6 @@ export default function CourseInformationForm() {
       return
     }
 
-    // Creating a New Course
     const formData = new FormData()
     formData.append("courseName", data.courseTitle)
     formData.append("courseDescription", data.courseShortDesc)
@@ -151,12 +121,18 @@ export default function CourseInformationForm() {
     setLoading(false)
   }
 
+  // Debugging function for mobile
+  const onInvalid = (errors) => {
+    console.error("Form Validation Errors:", errors)
+    toast.error("Please fill all required fields")
+  }
+
   return (
     <form
-      onSubmit={handleSubmit(onSubmit)}
+      onSubmit={handleSubmit(onSubmit, onInvalid)}
       className="space-y-8 rounded-md border-[1px] border-richblack-700 bg-richblack-800 p-6"
     >
-      {/* Course Title */}
+      {/* 1. Course Title */}
       <div className="flex flex-col space-y-2">
         <label className="text-sm text-richblack-5" htmlFor="courseTitle">
           Course Title <sup className="text-pink-200">*</sup>
@@ -167,14 +143,10 @@ export default function CourseInformationForm() {
           {...register("courseTitle", { required: true })}
           className="form-style w-full"
         />
-        {errors.courseTitle && (
-          <span className="ml-2 text-xs tracking-wide text-pink-200">
-            Course title is required
-          </span>
-        )}
+        {errors.courseTitle && <span className="ml-2 text-xs text-pink-200">Course title is required</span>}
       </div>
 
-      {/* Course Short Description */}
+      {/* 2. Description */}
       <div className="flex flex-col space-y-2">
         <label className="text-sm text-richblack-5" htmlFor="courseShortDesc">
           Course Short Description <sup className="text-pink-200">*</sup>
@@ -185,14 +157,10 @@ export default function CourseInformationForm() {
           {...register("courseShortDesc", { required: true })}
           className="form-style resize-x-none min-h-[130px] w-full"
         />
-        {errors.courseShortDesc && (
-          <span className="ml-2 text-xs tracking-wide text-pink-200">
-            Course Description is required
-          </span>
-        )}
+        {errors.courseShortDesc && <span className="ml-2 text-xs text-pink-200">Course Description is required</span>}
       </div>
 
-      {/* Course Price */}
+      {/* 3. Price */}
       <div className="flex flex-col space-y-2">
         <label className="text-sm text-richblack-5" htmlFor="coursePrice">
           Course Price <sup className="text-pink-200">*</sup>
@@ -204,22 +172,16 @@ export default function CourseInformationForm() {
             {...register("coursePrice", {
               required: true,
               valueAsNumber: true,
-              pattern: {
-                value: /^(0|[1-9]\d*)(\.\d+)?$/,
-              },
+              pattern: { value: /^(0|[1-9]\d*)(\.\d+)?$/ },
             })}
             className="form-style w-full !pl-12"
           />
-          <HiOutlineCurrencyRupee className="absolute left-3 top-1/2 inline-block -translate-y-1/2 text-2xl text-richblack-400" />
+          <HiOutlineCurrencyRupee className="absolute left-3 top-1/2 -translate-y-1/2 text-2xl text-richblack-400" />
         </div>
-        {errors.coursePrice && (
-          <span className="ml-2 text-xs tracking-wide text-pink-200">
-            Course Price is required
-          </span>
-        )}
+        {errors.coursePrice && <span className="ml-2 text-xs text-pink-200">Course Price is required</span>}
       </div>
 
-      {/* Course Category */}
+      {/* 4. Category */}
       <div className="flex flex-col space-y-2">
         <label className="text-sm text-richblack-5" htmlFor="courseCategory">
           Course Category <sup className="text-pink-200">*</sup>
@@ -230,84 +192,48 @@ export default function CourseInformationForm() {
           id="courseCategory"
           className="form-style w-full"
         >
-          <option value="" disabled>
-            Choose a Category
-          </option>
-          {!loading &&
-            courseCategories?.map((category, indx) => (
-              <option key={indx} value={category?._id}>
-                {category?.name}
-              </option>
-            ))}
+          <option value="" disabled>Choose a Category</option>
+          {!loading && courseCategories?.map((cat, i) => (
+            <option key={i} value={cat?._id}>{cat?.name}</option>
+          ))}
         </select>
-        {errors.courseCategory && (
-          <span className="ml-2 text-xs tracking-wide text-pink-200">
-            Course Category is required
-          </span>
-        )}
+        {errors.courseCategory && <span className="ml-2 text-xs text-pink-200">Category is required</span>}
       </div>
 
-      {/* Tags (Custom Component with Add Button) */}
-      <ChipInput
-        label="Tags"
-        name="courseTags"
-        placeholder="Enter Tags and press Enter or Add"
-        register={register}
-        errors={errors}
-        setValue={setValue}
-        getValues={getValues}
-      />
+      {/* Custom Fields */}
+      <ChipInput label="Tags" name="courseTags" placeholder="Enter Tags" register={register} errors={errors} setValue={setValue} getValues={getValues} />
+      
+      <Upload name="courseImage" label="Course Thumbnail" register={register} setValue={setValue} errors={errors} editData={editCourse ? course?.thumbnail : null} />
 
-      {/* Course Thumbnail */}
-      <Upload
-        name="courseImage"
-        label="Course Thumbnail"
-        register={register}
-        setValue={setValue}
-        errors={errors}
-        editData={editCourse ? course?.thumbnail : null}
-      />
-
-      {/* Benefits of the course */}
       <div className="flex flex-col space-y-2">
         <label className="text-sm text-richblack-5" htmlFor="courseBenefits">
           Benefits of the course <sup className="text-pink-200">*</sup>
         </label>
         <textarea
           id="courseBenefits"
-          placeholder="Enter benefits of the course"
+          placeholder="Enter benefits"
           {...register("courseBenefits", { required: true })}
           className="form-style resize-x-none min-h-[130px] w-full"
         />
-        {errors.courseBenefits && (
-          <span className="ml-2 text-xs tracking-wide text-pink-200">
-            Benefits of the course is required
-          </span>
-        )}
+        {errors.courseBenefits && <span className="ml-2 text-xs text-pink-200">Benefits are required</span>}
       </div>
 
-      {/* Requirements/Instructions (Custom Component with Add Button) */}
-      <RequirementsField
-        name="courseRequirements"
-        label="Requirements/Instructions"
-        register={register}
-        setValue={setValue}
-        errors={errors}
-        getValues={getValues}
-      />
+      <RequirementsField name="courseRequirements" label="Requirements" register={register} setValue={setValue} errors={errors} getValues={getValues} />
 
-      {/* Form Buttons */}
-      <div className="flex justify-end gap-x-2">
+      {/* Submit Section - Fixed for Mobile */}
+      <div className="flex justify-end gap-x-2 relative z-[10] mt-4">
         {editCourse && (
           <button
+            type="button" // Crucial fix: Prevents this from submitting the form
             onClick={() => dispatch(setStep(2))}
             disabled={loading}
-            className={`flex cursor-pointer items-center gap-x-2 rounded-md bg-richblack-300 py-[8px] px-[20px] font-semibold text-richblack-900`}
+            className="flex cursor-pointer items-center gap-x-2 rounded-md bg-richblack-300 py-[8px] px-[20px] font-semibold text-richblack-900"
           >
             Continue Without Saving
           </button>
         )}
         <IconBtn
+          type="submit" // Crucial fix: Forces submission
           disabled={loading}
           text={!editCourse ? "Next" : "Save Changes"}
         >
